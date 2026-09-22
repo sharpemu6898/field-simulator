@@ -1,0 +1,26 @@
+:root {
+  --color_fondo: black;
+  --color_texto: white;
+  --color-texto-contorno: rgb(19, 1, 1);
+  --color-neon: rgb(255, 255, 255);
+}
+body {
+  background-color: var(--color_fondo);
+  color: var(--color_texto);
+  font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  margin: 12vh 1rem 0;
+  font-size: clamp(4rem, 13vw, 11rem);
+  line-height: 0.95;
+}
+
+#sub {
+  margin: 2rem 1rem;
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
+  line-height: 1.3;
+}
