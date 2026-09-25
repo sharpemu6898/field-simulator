@@ -1,23 +1,68 @@
-<!doctype html>
-<html lang="en">
+﻿<!doctype html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="conoce mas de los campos electricos" />
+    <meta
+      name="description"
+      content="Simulador interactivo de campos eléctricos"
+    />
     <meta name="robots" content="index,follow" />
-    <title>Simulador de campo electrico</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Simulador de campo eléctrico</title>
+
     <link rel="stylesheet" href="estilos.css" />
   </head>
-  <body>
-    <header>
-      <h1>Field Simulator</h1>
-    </header>
 
+  <body>
     <main>
-      <section id="seccion hero" class="hero">
-        <h2 id="sub">Haz visible lo invisible: explora el campo electrico</h2>
-        <button id="boton-comienzo" type="button">Comenzar simulación</button>
+      <section id="portada" class="hero">
+        <h1 id="titulo">Field Simulator</h1>
+
+        <h2 id="sub">
+          Haz visible lo invisible: explora el campo eléctrico
+        </h2>
+
+        <button id="boton-comienzo" type="button">
+          Comenzar simulación
+        </button>
+      </section>
+
+      <section
+        id="simulador"
+        class="simulador"
+        aria-labelledby="titulo-simulador"
+        hidden
+      >
+        <header class="encabezado-simulador">
+          <div class="linea-electrica" aria-hidden="true"></div>
+
+          <h2 id="titulo-simulador">
+            Laboratorio de partículas eléctricas
+          </h2>
+
+          <div class="linea-electrica" aria-hidden="true"></div>
+        </header>
+
+        <div id="area-simulacion" class="area-simulacion">
+          <canvas id="lienzo"></canvas>
+
+          <aside
+            id="panel-controles"
+            class="panel-controles"
+          ></aside>
+
+          <div
+            id="lecturas-cursor"
+            class="lecturas-cursor"
+          ></div>
+        </div>
+
+        <div class="linea-electrica inferior" aria-hidden="true"></div>
       </section>
     </main>
+
+    <script src="render.js"></script>
+    <script src="ui.js"></script>
   </body>
 </html>
