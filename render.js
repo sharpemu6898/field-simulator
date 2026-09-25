@@ -1,5 +1,5 @@
 ﻿const lienzoRender = document.getElementById("lienzo");
-const contextoRender = lienzoRender.getContext("2d");
+const ctx = lienzoRender.getContext("2d");
 
 let anchoLienzo = lienzoRender.width;
 let altoLienzo = lienzoRender.height;
@@ -17,20 +17,13 @@ function ajustarLienzo() {
   lienzoRender.style.width = `${anchoLienzo}px`;
   lienzoRender.style.height = `${altoLienzo}px`;
 
-  contextoRender.setTransform(
-    proporcionPixeles,
-    0,
-    0,
-    proporcionPixeles,
-    0,
-    0
-  );
+  ctx.setTransform(proporcionPixeles, 0, 0, proporcionPixeles, 0, 0);
 
   dibujarEscena(cargasVisibles);
 }
 
 function limpiarLienzo() {
-  contextoRender.clearRect(0, 0, anchoLienzo, altoLienzo);
+  ctx.clearRect(0, 0, anchoLienzo, altoLienzo);
 }
 
 function dibujarCarga(carga) {
@@ -44,27 +37,27 @@ function dibujarCarga(carga) {
       : "#7d8799";
   const radio = 18 + Math.min(Math.abs(valor), 5) * 2;
 
-  contextoRender.save();
-  contextoRender.beginPath();
-  contextoRender.arc(carga.x, carga.y, radio, 0, Math.PI * 2);
-  contextoRender.fillStyle = colorCarga;
-  contextoRender.shadowColor = colorCarga;
-  contextoRender.shadowBlur = 18;
-  contextoRender.fill();
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(carga.x, carga.y, radio, 0, Math.PI * 2);
+  ctx.fillStyle = colorCarga;
+  ctx.shadowColor = colorCarga;
+  ctx.shadowBlur = 18;
+  ctx.fill();
 
-  contextoRender.lineWidth = 2;
-  contextoRender.strokeStyle = "rgba(255, 255, 255, 0.85)";
-  contextoRender.stroke();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+  ctx.stroke();
 
-  contextoRender.shadowBlur = 0;
-  contextoRender.fillStyle = "#ffffff";
-  contextoRender.font = "bold 18px Trebuchet MS";
-  contextoRender.textAlign = "center";
-  contextoRender.textBaseline = "middle";
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 18px Trebuchet MS";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
 
   const etiqueta = valor > 0 ? `+${valor}` : `${valor}`;
-  contextoRender.fillText(etiqueta, carga.x, carga.y);
-  contextoRender.restore();
+  ctx.fillText(etiqueta, carga.x, carga.y);
+  ctx.restore();
 }
 
 function dibujarEscena(cargas = []) {
@@ -82,3 +75,4 @@ window.addEventListener("resize", function () {
     ajustarLienzo();
   }
 });
+
