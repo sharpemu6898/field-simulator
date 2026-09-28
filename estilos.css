@@ -1,9 +1,11 @@
-:root {
+﻿:root {
   --color_fondo: black;
   --color_texto: white;
   --color-texto-contorno: rgb(19, 1, 1);
   --color-neon: rgb(255, 255, 255);
+  --azul-electrico: #00a8ff;
 }
+
 body {
   background-color: var(--color_fondo);
   color: var(--color_texto);
@@ -24,6 +26,7 @@ h1 {
   font-size: clamp(1.5rem, 3vw, 2.6rem);
   line-height: 1.3;
 }
+
 #boton-comienzo {
   background-color: var(--color_texto);
   color: var(--color_fondo);
@@ -33,10 +36,6 @@ h1 {
   padding: 0.9rem 1.6rem;
   font-size: 1.1rem;
   cursor: pointer;
-}
-
-:root {
-  --azul-electrico: #00a8ff;
 }
 
 [hidden] {
@@ -70,11 +69,107 @@ h1 {
     0 0 18px var(--azul-electrico);
 }
 
-.area-simulacion {
+.contenido-simulador {
+  display: grid;
+  grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+  gap: 1.5rem;
   min-height: 75vh;
   margin: 2rem 0;
 }
 
+.menus {
+  display: grid;
+  grid-auto-rows: max-content;
+  gap: 1rem;
+  text-align: left;
+}
+
+.menu {
+  padding: 1rem;
+  border: 1px solid rgba(0, 168, 255, 0.5);
+  border-radius: 10px;
+  background-color: rgba(0, 168, 255, 0.06);
+}
+
+.titulo-menu {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.opciones-carga {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.boton-tipo-carga {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #4b5568;
+  border-radius: 10px;
+  background-color: #101522;
+  color: white;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.simbolo-carga {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.positiva .simbolo-carga {
+  background-color: #ff304f;
+  box-shadow: 0 0 10px #ff304f;
+}
+
+.negativa .simbolo-carga {
+  background-color: #00a8ff;
+  box-shadow: 0 0 10px #00a8ff;
+}
+
+.boton-tipo-carga.seleccionada {
+  border-color: white;
+  background-color: #192134;
+}
+
+.area-simulacion {
+  position: relative;
+  min-width: 0;
+  min-height: 75vh;
+  overflow: hidden;
+  border: 1px solid rgba(0, 168, 255, 0.35);
+  border-radius: 10px;
+}
+
+#lienzo {
+  display: block;
+  cursor: crosshair;
+}
+
 .linea-electrica.inferior {
   width: 100%;
+}
+
+@media (max-width: 720px) {
+  .contenido-simulador {
+    grid-template-columns: 1fr;
+  }
+
+  .menus {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  #titulo-simulador {
+    white-space: normal;
+  }
 }

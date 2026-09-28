@@ -44,18 +44,43 @@
           <div class="linea-electrica" aria-hidden="true"></div>
         </header>
 
-        <div id="area-simulacion" class="area-simulacion">
-          <canvas id="lienzo"></canvas>
+        <div class="contenido-simulador">
+          <aside id="menus" class="menus">
+            <section class="menu">
+              <h3 class="titulo-menu">Tipo de carga</h3>
 
-          <aside
-            id="panel-controles"
-            class="panel-controles"
-          ></aside>
+              <div class="opciones-carga">
+                <button
+                  class="boton-tipo-carga positiva seleccionada"
+                  type="button"
+                  data-valor-carga="1"
+                  aria-pressed="true"
+                >
+                  <span class="simbolo-carga">+</span>
+                  Positiva
+                </button>
 
-          <div
-            id="lecturas-cursor"
-            class="lecturas-cursor"
-          ></div>
+                <button
+                  class="boton-tipo-carga negativa"
+                  type="button"
+                  data-valor-carga="-1"
+                  aria-pressed="false"
+                >
+                  <span class="simbolo-carga">−</span>
+                  Negativa
+                </button>
+              </div>
+            </section>
+          </aside>
+
+          <div id="area-simulacion" class="area-simulacion">
+            <canvas id="lienzo"></canvas>
+
+            <div
+              id="lecturas-cursor"
+              class="lecturas-cursor"
+            ></div>
+          </div>
         </div>
 
         <div class="linea-electrica inferior" aria-hidden="true"></div>
