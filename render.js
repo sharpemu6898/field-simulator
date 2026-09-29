@@ -4,6 +4,7 @@ const ctx = lienzoRender.getContext("2d");
 let anchoLienzo = lienzoRender.width;
 let altoLienzo = lienzoRender.height;
 let cargasVisibles = [];
+let lineasVisibles = [];
 
 function ajustarLienzo() {
   const areaSimulacion = document.getElementById("area-simulacion");
@@ -19,11 +20,30 @@ function ajustarLienzo() {
 
   ctx.setTransform(proporcionPixeles, 0, 0, proporcionPixeles, 0, 0);
 
-  dibujarEscena(cargasVisibles);
+  dibujarEscena(cargasVisibles, lineasVisibles);
 }
 
 function limpiarLienzo() {
   ctx.clearRect(0, 0, anchoLienzo, altoLienzo);
+}
+
+function dibujarLineaDeCampo(puntos) {
+  if (puntos.length < 2) return;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(puntos[0].x, puntos[0].y);
+
+  for (let i = 1; i < puntos.length; i++) {
+    ctx.lineTo(puntos[i].x, puntos[i].y);
+  }
+
+  ctx.strokeStyle = "rgba(80, 190, 255, 0.7)";
+  ctx.lineWidth = 1.2;
+  ctx.shadowColor = "#00a8ff";
+  ctx.shadowBlur = 4;
+  ctx.stroke();
+  ctx.restore();
 }
 
 function dibujarCarga(carga) {
@@ -60,9 +80,12 @@ function dibujarCarga(carga) {
   ctx.restore();
 }
 
-function dibujarEscena(cargas = []) {
+function dibujarEscena(cargas = [], lineas = []) {
   cargasVisibles = cargas;
+  lineasVisibles = lineas;
+
   limpiarLienzo();
+  lineasVisibles.forEach(dibujarLineaDeCampo);
   cargasVisibles.forEach(dibujarCarga);
 }
 
@@ -75,4 +98,3 @@ window.addEventListener("resize", function () {
     ajustarLienzo();
   }
 });
-

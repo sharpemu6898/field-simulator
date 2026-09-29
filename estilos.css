@@ -173,3 +173,41 @@ h1 {
     white-space: normal;
   }
 }
+
+.opciones-modo {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.boton-modo {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #4b5568;
+  border-radius: 10px;
+  background-color: #101522;
+  color: white;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.simbolo-modo {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background-color: #30394a;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.boton-modo.seleccionada {
+  border-color: var(--azul-electrico);
+  background-color: #192134;
+  box-shadow: 0 0 8px rgba(0, 168, 255, 0.35);
+}

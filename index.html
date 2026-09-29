@@ -47,6 +47,32 @@
         <div class="contenido-simulador">
           <aside id="menus" class="menus">
             <section class="menu">
+              <h3 class="titulo-menu">Herramienta</h3>
+
+              <div class="opciones-modo">
+                <button
+                  class="boton-modo seleccionada"
+                  type="button"
+                  data-modo="agregar"
+                  aria-pressed="true"
+                >
+                  <span class="simbolo-modo">+</span>
+                  Añadir carga
+                </button>
+
+                <button
+                  class="boton-modo"
+                  type="button"
+                  data-modo="eliminar"
+                  aria-pressed="false"
+                >
+                  <span class="simbolo-modo">×</span>
+                  Eliminar carga
+                </button>
+              </div>
+            </section>
+
+            <section class="menu">
               <h3 class="titulo-menu">Tipo de carga</h3>
 
               <div class="opciones-carga">
@@ -87,7 +113,10 @@
       </section>
     </main>
 
+    <script src="fisicas.js"></script>
     <script src="render.js"></script>
     <script src="ui.js"></script>
   </body>
 </html>
+
+
