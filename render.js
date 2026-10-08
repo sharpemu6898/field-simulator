@@ -5,6 +5,7 @@ let anchoLienzo = lienzoRender.width;
 let altoLienzo = lienzoRender.height;
 let cargasVisibles = [];
 let lineasVisibles = [];
+let equipotencialesVisibles = [];
 
 function ajustarLienzo() {
   const areaSimulacion = document.getElementById("area-simulacion");
@@ -20,11 +21,46 @@ function ajustarLienzo() {
 
   ctx.setTransform(proporcionPixeles, 0, 0, proporcionPixeles, 0, 0);
 
-  dibujarEscena(cargasVisibles, lineasVisibles);
+  dibujarEscena(
+    cargasVisibles,
+    lineasVisibles,
+    equipotencialesVisibles
+  );
 }
 
 function limpiarLienzo() {
   ctx.clearRect(0, 0, anchoLienzo, altoLienzo);
+}
+
+function dibujarEquipotenciales(equipotenciales) {
+  ctx.save();
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]);
+
+  equipotenciales.forEach(function (equipotencial) {
+    if (equipotencial.nivel > 0) {
+      ctx.strokeStyle = "rgba(255, 70, 100, 0.55)";
+    } else if (equipotencial.nivel < 0) {
+      ctx.strokeStyle = "rgba(0, 168, 255, 0.55)";
+    } else {
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+    }
+
+    ctx.beginPath();
+
+    equipotencial.segmentos.forEach(function (segmento) {
+      const coordenadasValidas = segmento.every(Number.isFinite);
+
+      if (!coordenadasValidas) return;
+
+      ctx.moveTo(segmento[0], segmento[1]);
+      ctx.lineTo(segmento[2], segmento[3]);
+    });
+
+    ctx.stroke();
+  });
+
+  ctx.restore();
 }
 
 function dibujarLineaDeCampo(puntos) {
@@ -80,11 +116,17 @@ function dibujarCarga(carga) {
   ctx.restore();
 }
 
-function dibujarEscena(cargas = [], lineas = []) {
+function dibujarEscena(
+  cargas = [],
+  lineas = [],
+  equipotenciales = []
+) {
   cargasVisibles = cargas;
   lineasVisibles = lineas;
+  equipotencialesVisibles = equipotenciales;
 
   limpiarLienzo();
+  dibujarEquipotenciales(equipotencialesVisibles);
   lineasVisibles.forEach(dibujarLineaDeCampo);
   cargasVisibles.forEach(dibujarCarga);
 }

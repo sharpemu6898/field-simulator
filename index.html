@@ -19,13 +19,9 @@
       <section id="portada" class="hero">
         <h1 id="titulo">Field Simulator</h1>
 
-        <h2 id="sub">
-          Haz visible lo invisible: explora el campo eléctrico
-        </h2>
+        <h2 id="sub">Haz visible lo invisible: explora el campo eléctrico</h2>
 
-        <button id="boton-comienzo" type="button">
-          Comenzar simulación
-        </button>
+        <button id="boton-comienzo" type="button">Comenzar simulación</button>
       </section>
 
       <section
@@ -37,9 +33,7 @@
         <header class="encabezado-simulador">
           <div class="linea-electrica" aria-hidden="true"></div>
 
-          <h2 id="titulo-simulador">
-            Laboratorio de partículas eléctricas
-          </h2>
+          <h2 id="titulo-simulador">Laboratorio de partículas eléctricas</h2>
 
           <div class="linea-electrica" aria-hidden="true"></div>
         </header>
@@ -97,15 +91,57 @@
                 </button>
               </div>
             </section>
+
+            <section class="menu">
+              <h3 class="titulo-menu">Visualización</h3>
+
+              <button
+                id="boton-equipotenciales"
+                class="boton-visualizacion"
+                type="button"
+                aria-pressed="false"
+              >
+                Líneas equipotenciales
+              </button>
+
+              <p class="descripcion-visualizacion">
+                Rojo: potencial positivo<br />
+                Azul: potencial negativo<br />
+                Blanco: potencial cero
+              </p>
+            </section>
           </aside>
 
           <div id="area-simulacion" class="area-simulacion">
             <canvas id="lienzo"></canvas>
 
-            <div
-              id="lecturas-cursor"
-              class="lecturas-cursor"
-            ></div>
+            <div id="lecturas-cursor" class="lecturas-cursor">
+              <h3>Lectura en el cursor</h3>
+
+              <div class="valores-cursor">
+                <p>Posición: <span id="valor-posicion">—</span></p>
+                <p>E<sub>x</sub>: <span id="valor-ex">—</span></p>
+                <p>E<sub>y</sub>: <span id="valor-ey">—</span></p>
+                <p>|E|: <span id="valor-campo">—</span></p>
+                <p>V: <span id="valor-potencial">—</span></p>
+              </div>
+
+              <div class="formulas-cursor">
+                <p class="formula">
+                  E⃗(P) = Σ kq<sub>i</sub>r⃗<sub>i</sub> /
+                  (r<sub>i</sub><sup>2</sup> + ε<sup>2</sup>)<sup>3/2</sup>
+                </p>
+
+                <p class="formula">
+                  V(P) = Σ kq<sub>i</sub> /
+                  √(r<sub>i</sub><sup>2</sup> + ε<sup>2</sup>)
+                </p>
+
+                <small>
+                  ε evita valores infinitos. Unidades de simulación.
+                </small>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -118,5 +154,4 @@
     <script src="ui.js"></script>
   </body>
 </html>
-
 

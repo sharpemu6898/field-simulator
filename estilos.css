@@ -211,3 +211,83 @@ h1 {
   background-color: #192134;
   box-shadow: 0 0 8px rgba(0, 168, 255, 0.35);
 }
+
+.boton-visualizacion {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #4b5568;
+  border-radius: 10px;
+  background-color: #101522;
+  color: white;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.boton-visualizacion.seleccionada {
+  border-color: var(--azul-electrico);
+  background-color: #192134;
+  box-shadow: 0 0 8px rgba(0, 168, 255, 0.35);
+}
+
+.descripcion-visualizacion {
+  margin: 0.8rem 0 0;
+  color: #aeb8ca;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.lecturas-cursor {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  width: min(300px, calc(100% - 2rem));
+  padding: 1rem;
+  border: 1px solid rgba(0, 168, 255, 0.55);
+  border-radius: 10px;
+  background-color: rgba(5, 10, 20, 0.9);
+  color: white;
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0 0 12px rgba(0, 168, 255, 0.2);
+}
+
+.lecturas-cursor h3 {
+  margin: 0 0 0.75rem;
+  color: var(--azul-electrico);
+  font-size: 1rem;
+}
+
+.valores-cursor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 1rem;
+}
+
+.valores-cursor p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.formulas-cursor {
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  color: #c7d3e6;
+}
+
+.formula {
+  margin: 0.35rem 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.formulas-cursor small {
+  display: block;
+  margin-top: 0.55rem;
+  color: #96a5bb;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
