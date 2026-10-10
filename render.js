@@ -6,6 +6,7 @@ let altoLienzo = lienzoRender.height;
 let cargasVisibles = [];
 let lineasVisibles = [];
 let equipotencialesVisibles = [];
+let vectoresVisibles = [];
 
 function ajustarLienzo() {
   const areaSimulacion = document.getElementById("area-simulacion");
@@ -24,7 +25,8 @@ function ajustarLienzo() {
   dibujarEscena(
     cargasVisibles,
     lineasVisibles,
-    equipotencialesVisibles
+    equipotencialesVisibles,
+    vectoresVisibles
   );
 }
 
@@ -57,6 +59,48 @@ function dibujarEquipotenciales(equipotenciales) {
       ctx.lineTo(segmento[2], segmento[3]);
     });
 
+    ctx.stroke();
+  });
+
+  ctx.restore();
+}
+
+function dibujarCampoVectorial(vectores) {
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  vectores.forEach(function (vector) {
+    const ux = vector.ex / vector.magnitud;
+    const uy = vector.ey / vector.magnitud;
+    const intensidad = Math.min(
+      1,
+      Math.log10(1 + vector.magnitud) / 6
+    );
+    const longitud = 8 + intensidad * 16;
+    const mitad = longitud / 2;
+    const inicioX = vector.x - ux * mitad;
+    const inicioY = vector.y - uy * mitad;
+    const finalX = vector.x + ux * mitad;
+    const finalY = vector.y + uy * mitad;
+    const angulo = Math.atan2(uy, ux);
+    const cabeza = Math.min(6, longitud * 0.35);
+    const rojoVerde = Math.round(120 + intensidad * 135);
+
+    ctx.strokeStyle = `rgba(${rojoVerde}, ${rojoVerde}, 255, ${0.5 + intensidad * 0.4})`;
+    ctx.lineWidth = 1 + intensidad;
+    ctx.beginPath();
+    ctx.moveTo(inicioX, inicioY);
+    ctx.lineTo(finalX, finalY);
+    ctx.lineTo(
+      finalX - cabeza * Math.cos(angulo - Math.PI / 6),
+      finalY - cabeza * Math.sin(angulo - Math.PI / 6)
+    );
+    ctx.moveTo(finalX, finalY);
+    ctx.lineTo(
+      finalX - cabeza * Math.cos(angulo + Math.PI / 6),
+      finalY - cabeza * Math.sin(angulo + Math.PI / 6)
+    );
     ctx.stroke();
   });
 
@@ -119,14 +163,17 @@ function dibujarCarga(carga) {
 function dibujarEscena(
   cargas = [],
   lineas = [],
-  equipotenciales = []
+  equipotenciales = [],
+  vectores = []
 ) {
   cargasVisibles = cargas;
   lineasVisibles = lineas;
   equipotencialesVisibles = equipotenciales;
+  vectoresVisibles = vectores;
 
   limpiarLienzo();
   dibujarEquipotenciales(equipotencialesVisibles);
+  dibujarCampoVectorial(vectoresVisibles);
   lineasVisibles.forEach(dibujarLineaDeCampo);
   cargasVisibles.forEach(dibujarCarga);
 }

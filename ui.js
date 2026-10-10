@@ -4,9 +4,15 @@ const simulador = document.getElementById("simulador");
 const lienzo = document.getElementById("lienzo");
 const botonesTipoCarga = document.querySelectorAll(".boton-tipo-carga");
 const botonesModo = document.querySelectorAll(".boton-modo");
+const controlMagnitud = document.getElementById("control-magnitud");
+const valorMagnitud = document.getElementById("valor-magnitud");
+const botonCampoVectorial = document.getElementById(
+  "boton-campo-vectorial"
+);
 const botonEquipotenciales = document.getElementById(
   "boton-equipotenciales"
 );
+const botonLimpiar = document.getElementById("boton-limpiar");
 const valorPosicion = document.getElementById("valor-posicion");
 const valorEx = document.getElementById("valor-ex");
 const valorEy = document.getElementById("valor-ey");
@@ -14,11 +20,14 @@ const valorCampo = document.getElementById("valor-campo");
 const valorPotencial = document.getElementById("valor-potencial");
 
 const cargas = [];
-let valorCargaSeleccionada = 1;
+let signoCargaSeleccionada = 1;
+let magnitudCargaSeleccionada = 1;
 let modoLienzo = "agregar";
+let mostrarCampoVectorial = false;
 let mostrarEquipotenciales = false;
 let posicionCursorPendiente = null;
 let cuadroLecturaCursor = null;
+let cuadroRedimension = null;
 
 function iniciarSimulador() {
   portada.hidden = true;
@@ -30,7 +39,7 @@ function iniciarSimulador() {
 function seleccionarTipoCarga(evento) {
   const botonSeleccionado = evento.currentTarget;
 
-  valorCargaSeleccionada = Number(
+  signoCargaSeleccionada = Number(
     botonSeleccionado.dataset.valorCarga
   );
 
@@ -42,6 +51,11 @@ function seleccionarTipoCarga(evento) {
   });
 }
 
+
+function cambiarMagnitud() {
+  magnitudCargaSeleccionada = Number(controlMagnitud.value);
+  valorMagnitud.textContent = magnitudCargaSeleccionada;
+}
 function seleccionarModo(evento) {
   const botonSeleccionado = evento.currentTarget;
 
@@ -53,6 +67,22 @@ function seleccionarModo(evento) {
     boton.classList.toggle("seleccionada", estaSeleccionado);
     boton.setAttribute("aria-pressed", estaSeleccionado);
   });
+}
+
+function alternarCampoVectorial() {
+  mostrarCampoVectorial = !mostrarCampoVectorial;
+
+  botonCampoVectorial.classList.toggle(
+    "seleccionada",
+    mostrarCampoVectorial
+  );
+
+  botonCampoVectorial.setAttribute(
+    "aria-pressed",
+    mostrarCampoVectorial
+  );
+
+  actualizarEscena();
 }
 
 function alternarEquipotenciales() {
@@ -69,6 +99,31 @@ function alternarEquipotenciales() {
   );
 
   actualizarEscena();
+}
+
+function calcularMallaVectorial(ancho, alto, separacion = 45) {
+  const vectores = [];
+  const margen = separacion / 2;
+
+  for (let y = margen; y < alto; y += separacion) {
+    for (let x = margen; x < ancho; x += separacion) {
+      if (estaDentroDeAlgunaCarga(cargas, x, y)) continue;
+
+      const campo = calcularCampo(cargas, x, y);
+
+      if (campo.magnitud < 1e-9) continue;
+
+      vectores.push({
+        x: x,
+        y: y,
+        ex: campo.ex,
+        ey: campo.ey,
+        magnitud: campo.magnitud
+      });
+    }
+  }
+
+  return vectores;
 }
 
 function actualizarEscena() {
@@ -91,11 +146,18 @@ function actualizarEscena() {
       })
     : [];
 
-  dibujarEscena(cargas, lineas, equipotenciales);
+  const vectores = mostrarCampoVectorial
+    ? calcularMallaVectorial(ancho, alto)
+    : [];
+
+  dibujarEscena(cargas, lineas, equipotenciales, vectores);
+  botonLimpiar.disabled = cargas.length === 0;
 }
 
 function agregarCarga(x, y) {
-  const carga = crearCarga(x, y, valorCargaSeleccionada);
+  const valorCarga =
+    signoCargaSeleccionada * magnitudCargaSeleccionada;
+  const carga = crearCarga(x, y, valorCarga);
 
   cargas.push(carga);
   actualizarEscena();
@@ -127,6 +189,12 @@ function manejarClickLienzo(evento) {
   agregarCarga(x, y);
 }
 
+
+function limpiarEscenario() {
+  cargas.length = 0;
+  actualizarEscena();
+  limpiarLecturaCursor();
+}
 function formatearValor(valor) {
   if (!Number.isFinite(valor)) return "—";
 
@@ -190,11 +258,24 @@ function limpiarLecturaCursor() {
   valorPotencial.textContent = "—";
 }
 
+function programarActualizacionPorRedimension() {
+  if (simulador.hidden || cuadroRedimension !== null) return;
+
+  cuadroRedimension = requestAnimationFrame(function () {
+    cuadroRedimension = null;
+    actualizarEscena();
+  });
+}
+
 botonComienzo.addEventListener("click", iniciarSimulador);
+controlMagnitud.addEventListener("input", cambiarMagnitud);
+botonLimpiar.addEventListener("click", limpiarEscenario);
 lienzo.addEventListener("click", manejarClickLienzo);
 lienzo.addEventListener("mousemove", registrarMovimientoCursor);
 lienzo.addEventListener("mouseleave", limpiarLecturaCursor);
+botonCampoVectorial.addEventListener("click", alternarCampoVectorial);
 botonEquipotenciales.addEventListener("click", alternarEquipotenciales);
+window.addEventListener("resize", programarActualizacionPorRedimension);
 
 botonesTipoCarga.forEach(function (boton) {
   boton.addEventListener("click", seleccionarTipoCarga);
@@ -203,3 +284,5 @@ botonesTipoCarga.forEach(function (boton) {
 botonesModo.forEach(function (boton) {
   boton.addEventListener("click", seleccionarModo);
 });
+
+

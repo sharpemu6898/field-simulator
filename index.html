@@ -92,17 +92,57 @@
               </div>
             </section>
 
+
+            <section class="menu">
+              <div class="encabezado-magnitud">
+                <label for="control-magnitud">Magnitud</label>
+
+                <output id="valor-magnitud" for="control-magnitud">
+                  1
+                </output>
+              </div>
+
+              <input
+                id="control-magnitud"
+                class="control-magnitud"
+                type="range"
+                min="1"
+                max="5"
+                step="1"
+                value="1"
+              />
+
+              <div class="limites-magnitud" aria-hidden="true">
+                <span>1</span>
+                <span>5</span>
+              </div>
+
+              <p class="descripcion-magnitud">
+                Se aplicará a las cargas nuevas.
+              </p>
+            </section>
             <section class="menu">
               <h3 class="titulo-menu">Visualización</h3>
 
-              <button
-                id="boton-equipotenciales"
-                class="boton-visualizacion"
-                type="button"
-                aria-pressed="false"
-              >
-                Líneas equipotenciales
-              </button>
+              <div class="opciones-visualizacion">
+                <button
+                  id="boton-campo-vectorial"
+                  class="boton-visualizacion"
+                  type="button"
+                  aria-pressed="false"
+                >
+                  Campo vectorial
+                </button>
+
+                <button
+                  id="boton-equipotenciales"
+                  class="boton-visualizacion"
+                  type="button"
+                  aria-pressed="false"
+                >
+                  Líneas equipotenciales
+                </button>
+              </div>
 
               <p class="descripcion-visualizacion">
                 Rojo: potencial positivo<br />
@@ -110,7 +150,17 @@
                 Blanco: potencial cero
               </p>
             </section>
-          </aside>
+
+            <div class="acciones-menu">
+              <button
+                id="boton-limpiar"
+                class="boton-limpiar"
+                type="button"
+                disabled
+              >
+                Limpiar lienzo
+              </button>
+            </div>          </aside>
 
           <div id="area-simulacion" class="area-simulacion">
             <canvas id="lienzo"></canvas>
@@ -154,4 +204,7 @@
     <script src="ui.js"></script>
   </body>
 </html>
+
+
+
 
