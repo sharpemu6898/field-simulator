@@ -63,6 +63,15 @@
                   <span class="simbolo-modo">×</span>
                   Eliminar carga
                 </button>
+                <button
+                  class="boton-modo"
+                  type="button"
+                  data-modo="particula"
+                  aria-pressed="false"
+                >
+                  <span class="simbolo-modo">●</span>
+                  Colocar partícula
+                </button>
               </div>
             </section>
 
@@ -121,6 +130,36 @@
                 Se aplicará a las cargas nuevas.
               </p>
             </section>
+            
+            <section class="menu">
+              <h3 class="titulo-menu">Partícula de prueba</h3>
+
+              <div class="opciones-particula">
+                <button
+                  class="boton-tipo-particula electron seleccionada"
+                  type="button"
+                  data-tipo-particula="electron"
+                  aria-pressed="true"
+                >
+                  <span class="simbolo-particula">e⁻</span>
+                  Electrón
+                </button>
+
+                <button
+                  class="boton-tipo-particula proton"
+                  type="button"
+                  data-tipo-particula="proton"
+                  aria-pressed="false"
+                >
+                  <span class="simbolo-particula">p⁺</span>
+                  Protón
+                </button>
+              </div>
+
+              <p class="descripcion-particula">
+                Elige “Colocar partícula” y haz clic en el lienzo.
+              </p>
+            </section>
             <section class="menu">
               <h3 class="titulo-menu">Visualización</h3>
 
@@ -160,7 +199,8 @@
               >
                 Limpiar lienzo
               </button>
-            </div>          </aside>
+            </div>
+          </aside>
 
           <div id="area-simulacion" class="area-simulacion">
             <canvas id="lienzo"></canvas>
@@ -204,6 +244,7 @@
     <script src="ui.js"></script>
   </body>
 </html>
+
 
 
 

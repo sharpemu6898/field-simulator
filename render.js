@@ -7,6 +7,7 @@ let cargasVisibles = [];
 let lineasVisibles = [];
 let equipotencialesVisibles = [];
 let vectoresVisibles = [];
+let particulasVisibles = [];
 
 function ajustarLienzo() {
   const areaSimulacion = document.getElementById("area-simulacion");
@@ -26,7 +27,8 @@ function ajustarLienzo() {
     cargasVisibles,
     lineasVisibles,
     equipotencialesVisibles,
-    vectoresVisibles
+    vectoresVisibles,
+    particulasVisibles
   );
 }
 
@@ -52,7 +54,6 @@ function dibujarEquipotenciales(equipotenciales) {
 
     equipotencial.segmentos.forEach(function (segmento) {
       const coordenadasValidas = segmento.every(Number.isFinite);
-
       if (!coordenadasValidas) return;
 
       ctx.moveTo(segmento[0], segmento[1]);
@@ -126,6 +127,32 @@ function dibujarLineaDeCampo(puntos) {
   ctx.restore();
 }
 
+function dibujarTrayectoria(particula) {
+  if (particula.trayectoria.length < 2) return;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(
+    particula.trayectoria[0].x,
+    particula.trayectoria[0].y
+  );
+
+  for (let i = 1; i < particula.trayectoria.length; i++) {
+    ctx.lineTo(
+      particula.trayectoria[i].x,
+      particula.trayectoria[i].y
+    );
+  }
+
+  ctx.strokeStyle =
+    particula.tipo === "electron"
+      ? "rgba(0, 210, 255, 0.55)"
+      : "rgba(255, 90, 80, 0.55)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+}
+
 function dibujarCarga(carga) {
   const valor = Number(carga.valor);
   const esPositiva = valor > 0;
@@ -160,22 +187,59 @@ function dibujarCarga(carga) {
   ctx.restore();
 }
 
+function dibujarParticula(particula) {
+  const esElectron = particula.tipo === "electron";
+  const color = esElectron ? "#00d2ff" : "#ff5a50";
+  const simbolo = esElectron ? "−" : "+";
+
+  ctx.save();
+  ctx.globalAlpha = particula.activa ? 1 : 0.55;
+  ctx.beginPath();
+  ctx.arc(particula.x, particula.y, 8, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 12;
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 12px Trebuchet MS";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(simbolo, particula.x, particula.y);
+  ctx.restore();
+}
+
 function dibujarEscena(
   cargas = [],
   lineas = [],
   equipotenciales = [],
-  vectores = []
+  vectores = [],
+  particulas = []
 ) {
   cargasVisibles = cargas;
   lineasVisibles = lineas;
   equipotencialesVisibles = equipotenciales;
   vectoresVisibles = vectores;
+  particulasVisibles = particulas;
 
   limpiarLienzo();
   dibujarEquipotenciales(equipotencialesVisibles);
   dibujarCampoVectorial(vectoresVisibles);
   lineasVisibles.forEach(dibujarLineaDeCampo);
+  particulasVisibles.forEach(dibujarTrayectoria);
   cargasVisibles.forEach(dibujarCarga);
+  particulasVisibles.forEach(dibujarParticula);
+}
+
+function redibujarParticulas(particulas) {
+  dibujarEscena(
+    cargasVisibles,
+    lineasVisibles,
+    equipotencialesVisibles,
+    vectoresVisibles,
+    particulas
+  );
 }
 
 function iniciarRender() {

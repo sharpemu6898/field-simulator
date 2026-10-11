@@ -3,6 +3,9 @@ const portada = document.getElementById("portada");
 const simulador = document.getElementById("simulador");
 const lienzo = document.getElementById("lienzo");
 const botonesTipoCarga = document.querySelectorAll(".boton-tipo-carga");
+const botonesTipoParticula = document.querySelectorAll(
+  ".boton-tipo-particula"
+);
 const botonesModo = document.querySelectorAll(".boton-modo");
 const controlMagnitud = document.getElementById("control-magnitud");
 const valorMagnitud = document.getElementById("valor-magnitud");
@@ -20,50 +23,64 @@ const valorCampo = document.getElementById("valor-campo");
 const valorPotencial = document.getElementById("valor-potencial");
 
 const cargas = [];
+const particulas = [];
+const PASO_FISICA = 1 / 120;
+
 let signoCargaSeleccionada = 1;
 let magnitudCargaSeleccionada = 1;
+let tipoParticulaSeleccionada = "electron";
 let modoLienzo = "agregar";
 let mostrarCampoVectorial = false;
 let mostrarEquipotenciales = false;
 let posicionCursorPendiente = null;
 let cuadroLecturaCursor = null;
 let cuadroRedimension = null;
+let idAnimacionParticulas = null;
+let tiempoAnterior = null;
+let acumuladorTiempo = 0;
 
 function iniciarSimulador() {
   portada.hidden = true;
   simulador.hidden = false;
-
   iniciarRender();
 }
 
 function seleccionarTipoCarga(evento) {
   const botonSeleccionado = evento.currentTarget;
-
   signoCargaSeleccionada = Number(
     botonSeleccionado.dataset.valorCarga
   );
 
   botonesTipoCarga.forEach(function (boton) {
     const estaSeleccionado = boton === botonSeleccionado;
-
     boton.classList.toggle("seleccionada", estaSeleccionado);
     boton.setAttribute("aria-pressed", estaSeleccionado);
   });
 }
 
-
 function cambiarMagnitud() {
   magnitudCargaSeleccionada = Number(controlMagnitud.value);
   valorMagnitud.textContent = magnitudCargaSeleccionada;
 }
+
+function seleccionarTipoParticula(evento) {
+  const botonSeleccionado = evento.currentTarget;
+  tipoParticulaSeleccionada =
+    botonSeleccionado.dataset.tipoParticula;
+
+  botonesTipoParticula.forEach(function (boton) {
+    const estaSeleccionado = boton === botonSeleccionado;
+    boton.classList.toggle("seleccionada", estaSeleccionado);
+    boton.setAttribute("aria-pressed", estaSeleccionado);
+  });
+}
+
 function seleccionarModo(evento) {
   const botonSeleccionado = evento.currentTarget;
-
   modoLienzo = botonSeleccionado.dataset.modo;
 
   botonesModo.forEach(function (boton) {
     const estaSeleccionado = boton === botonSeleccionado;
-
     boton.classList.toggle("seleccionada", estaSeleccionado);
     boton.setAttribute("aria-pressed", estaSeleccionado);
   });
@@ -71,33 +88,27 @@ function seleccionarModo(evento) {
 
 function alternarCampoVectorial() {
   mostrarCampoVectorial = !mostrarCampoVectorial;
-
   botonCampoVectorial.classList.toggle(
     "seleccionada",
     mostrarCampoVectorial
   );
-
   botonCampoVectorial.setAttribute(
     "aria-pressed",
     mostrarCampoVectorial
   );
-
   actualizarEscena();
 }
 
 function alternarEquipotenciales() {
   mostrarEquipotenciales = !mostrarEquipotenciales;
-
   botonEquipotenciales.classList.toggle(
     "seleccionada",
     mostrarEquipotenciales
   );
-
   botonEquipotenciales.setAttribute(
     "aria-pressed",
     mostrarEquipotenciales
   );
-
   actualizarEscena();
 }
 
@@ -110,7 +121,6 @@ function calcularMallaVectorial(ancho, alto, separacion = 45) {
       if (estaDentroDeAlgunaCarga(cargas, x, y)) continue;
 
       const campo = calcularCampo(cargas, x, y);
-
       if (campo.magnitud < 1e-9) continue;
 
       vectores.push({
@@ -129,7 +139,6 @@ function calcularMallaVectorial(ancho, alto, separacion = 45) {
 function actualizarEscena() {
   const ancho = lienzo.clientWidth;
   const alto = lienzo.clientHeight;
-
   const lineas = calcularLineasDeCampo(cargas, {
     ancho: ancho,
     alto: alto,
@@ -137,7 +146,6 @@ function actualizarEscena() {
     maxPasos: 1200,
     lineasPorCarga: 12
   });
-
   const equipotenciales = mostrarEquipotenciales
     ? calcularEquipotenciales(cargas, null, {
         ancho: ancho,
@@ -145,13 +153,20 @@ function actualizarEscena() {
         celda: 12
       })
     : [];
-
   const vectores = mostrarCampoVectorial
     ? calcularMallaVectorial(ancho, alto)
     : [];
 
-  dibujarEscena(cargas, lineas, equipotenciales, vectores);
-  botonLimpiar.disabled = cargas.length === 0;
+  dibujarEscena(
+    cargas,
+    lineas,
+    equipotenciales,
+    vectores,
+    particulas
+  );
+
+  botonLimpiar.disabled =
+    cargas.length === 0 && particulas.length === 0;
 }
 
 function agregarCarga(x, y) {
@@ -176,6 +191,74 @@ function eliminarCarga(x, y) {
   }
 }
 
+function colocarParticula(x, y) {
+  const particula = crearParticula(
+    tipoParticulaSeleccionada,
+    x,
+    y
+  );
+  const aceleracionInicial = calcularAceleracion(
+    particula,
+    cargas
+  );
+
+  particula.ax = aceleracionInicial.ax;
+  particula.ay = aceleracionInicial.ay;
+  particulas.length = 0;
+  particulas.push(particula);
+
+  actualizarEscena();
+  iniciarAnimacionParticulas();
+}
+
+function iniciarAnimacionParticulas() {
+  if (idAnimacionParticulas !== null) return;
+
+  tiempoAnterior = null;
+  acumuladorTiempo = 0;
+  idAnimacionParticulas = requestAnimationFrame(animarParticulas);
+}
+
+function animarParticulas(tiempoActual) {
+  if (tiempoAnterior === null) {
+    tiempoAnterior = tiempoActual;
+  }
+
+  const tiempoReal = Math.min(
+    (tiempoActual - tiempoAnterior) / 1000,
+    0.05
+  );
+
+  tiempoAnterior = tiempoActual;
+  acumuladorTiempo += tiempoReal;
+
+  while (acumuladorTiempo >= PASO_FISICA) {
+    particulas.forEach(function (particula) {
+      avanzarParticula(
+        particula,
+        cargas,
+        PASO_FISICA,
+        lienzo.clientWidth,
+        lienzo.clientHeight
+      );
+    });
+    acumuladorTiempo -= PASO_FISICA;
+  }
+
+  redibujarParticulas(particulas);
+
+  const hayParticulasActivas = particulas.some(function (particula) {
+    return particula.activa;
+  });
+
+  if (hayParticulasActivas) {
+    idAnimacionParticulas = requestAnimationFrame(animarParticulas);
+  } else {
+    idAnimacionParticulas = null;
+    tiempoAnterior = null;
+  }
+}
+
 function manejarClickLienzo(evento) {
   const posicionLienzo = lienzo.getBoundingClientRect();
   const x = evento.clientX - posicionLienzo.left;
@@ -186,15 +269,29 @@ function manejarClickLienzo(evento) {
     return;
   }
 
+  if (modoLienzo === "particula") {
+    colocarParticula(x, y);
+    return;
+  }
+
   agregarCarga(x, y);
 }
 
-
 function limpiarEscenario() {
   cargas.length = 0;
+  particulas.length = 0;
+
+  if (idAnimacionParticulas !== null) {
+    cancelAnimationFrame(idAnimacionParticulas);
+    idAnimacionParticulas = null;
+  }
+
+  tiempoAnterior = null;
+  acumuladorTiempo = 0;
   actualizarEscena();
   limpiarLecturaCursor();
 }
+
 function formatearValor(valor) {
   if (!Number.isFinite(valor)) return "—";
 
@@ -221,7 +318,6 @@ function mostrarLecturaCursor(x, y) {
 
 function actualizarLecturaCursor() {
   cuadroLecturaCursor = null;
-
   if (!posicionCursorPendiente) return;
 
   mostrarLecturaCursor(
@@ -281,8 +377,10 @@ botonesTipoCarga.forEach(function (boton) {
   boton.addEventListener("click", seleccionarTipoCarga);
 });
 
+botonesTipoParticula.forEach(function (boton) {
+  boton.addEventListener("click", seleccionarTipoParticula);
+});
+
 botonesModo.forEach(function (boton) {
   boton.addEventListener("click", seleccionarModo);
 });
-
-
