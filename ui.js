@@ -21,10 +21,23 @@ const valorEx = document.getElementById("valor-ex");
 const valorEy = document.getElementById("valor-ey");
 const valorCampo = document.getElementById("valor-campo");
 const valorPotencial = document.getElementById("valor-potencial");
+const resultadoComparacion = document.getElementById(
+  "resultado-comparacion"
+);
+const aceleracionElectron = document.getElementById(
+  "aceleracion-electron"
+);
+const aceleracionProton = document.getElementById(
+  "aceleracion-proton"
+);
+const razonAceleracion = document.getElementById(
+  "razon-aceleracion"
+);
 
 const cargas = [];
 const particulas = [];
 const PASO_FISICA = 1 / 120;
+const FACTOR_VISUAL_PROTON = 40;
 
 let signoCargaSeleccionada = 1;
 let magnitudCargaSeleccionada = 1;
@@ -67,6 +80,10 @@ function seleccionarTipoParticula(evento) {
   const botonSeleccionado = evento.currentTarget;
   tipoParticulaSeleccionada =
     botonSeleccionado.dataset.tipoParticula;
+
+  if (tipoParticulaSeleccionada !== "comparacion") {
+    resultadoComparacion.hidden = true;
+  }
 
   botonesTipoParticula.forEach(function (boton) {
     const estaSeleccionado = boton === botonSeleccionado;
@@ -191,12 +208,27 @@ function eliminarCarga(x, y) {
   }
 }
 
-function colocarParticula(x, y) {
-  const particula = crearParticula(
-    tipoParticulaSeleccionada,
-    x,
-    y
+function mostrarResultadoComparacion(resultado) {
+  aceleracionElectron.textContent = formatearValor(
+    resultado.aceleracionElectron
   );
+  aceleracionProton.textContent = formatearValor(
+    resultado.aceleracionProton
+  );
+  razonAceleracion.textContent = Number.isFinite(
+    resultado.razonAceleracion
+  )
+    ? `${resultado.razonAceleracion.toFixed(0)} veces`
+    : "—";
+  resultadoComparacion.hidden = false;
+}
+
+function prepararParticulaParaAnimacion(particula) {
+  if (particula.tipo === "proton") {
+    particula.masaFisica = particula.masa;
+    particula.masa /= FACTOR_VISUAL_PROTON;
+  }
+
   const aceleracionInicial = calcularAceleracion(
     particula,
     cargas
@@ -204,8 +236,31 @@ function colocarParticula(x, y) {
 
   particula.ax = aceleracionInicial.ax;
   particula.ay = aceleracionInicial.ay;
+}
+
+function colocarParticula(x, y) {
   particulas.length = 0;
-  particulas.push(particula);
+  tiempoAnterior = null;
+  acumuladorTiempo = 0;
+
+  if (tipoParticulaSeleccionada === "comparacion") {
+    const resultado = compararElectronProton(cargas, x, y);
+
+    prepararParticulaParaAnimacion(resultado.electron);
+    prepararParticulaParaAnimacion(resultado.proton);
+    particulas.push(resultado.electron, resultado.proton);
+    mostrarResultadoComparacion(resultado);
+  } else {
+    const particula = crearParticula(
+      tipoParticulaSeleccionada,
+      x,
+      y
+    );
+
+    prepararParticulaParaAnimacion(particula);
+    particulas.push(particula);
+    resultadoComparacion.hidden = true;
+  }
 
   actualizarEscena();
   iniciarAnimacionParticulas();
@@ -280,6 +335,7 @@ function manejarClickLienzo(evento) {
 function limpiarEscenario() {
   cargas.length = 0;
   particulas.length = 0;
+  resultadoComparacion.hidden = true;
 
   if (idAnimacionParticulas !== null) {
     cancelAnimationFrame(idAnimacionParticulas);
@@ -384,3 +440,4 @@ botonesTipoParticula.forEach(function (boton) {
 botonesModo.forEach(function (boton) {
   boton.addEventListener("click", seleccionarModo);
 });
+

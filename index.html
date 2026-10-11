@@ -128,7 +128,7 @@
               </p>
             </section>
 
-            <section class="menu">
+            <section class="menu menu-particula">
               <h3 class="titulo-menu">Partícula de prueba</h3>
 
               <div class="opciones-particula">
@@ -151,10 +151,42 @@
                   <span class="simbolo-particula">p⁺</span>
                   Protón
                 </button>
+                <button
+                  class="boton-tipo-particula comparacion"
+                  type="button"
+                  data-tipo-particula="comparacion"
+                  aria-pressed="false"
+                >
+                  <span class="simbolo-particula">e⁻/p⁺</span>
+                  Comparar ambos
+                </button>
               </div>
 
+
+              <div
+                id="resultado-comparacion"
+                class="resultado-comparacion"
+                aria-live="polite"
+                hidden
+              >
+                <p>
+                  Aceleración del electrón:
+                  <span id="aceleracion-electron">—</span>
+                </p>
+
+                <p>
+                  Aceleración del protón:
+                  <span id="aceleracion-proton">—</span>
+                </p>
+
+                <p>
+                  Relación:
+                  <strong id="razon-aceleracion">—</strong>
+                </p>
+              </div>
               <p class="descripcion-particula">
                 Elige “Colocar partícula” y haz clic en el lienzo.
+                El movimiento del protón se amplifica ×40 para hacerlo visible.
               </p>
             </section>
             <section class="menu">
@@ -241,3 +273,4 @@
     <script src="ui.js"></script>
   </body>
 </html>
+

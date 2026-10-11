@@ -71,7 +71,7 @@ h1 {
 
 .contenido-simulador {
   display: grid;
-  grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+  grid-template-columns: minmax(250px, 290px) minmax(0, 1fr);
   gap: 1.5rem;
   min-height: 75vh;
   margin: 2rem 0;
@@ -161,7 +161,7 @@ h1 {
   width: 100%;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 800px) {
   .contenido-simulador {
     grid-template-columns: 1fr;
   }
@@ -415,4 +415,36 @@ h1 {
   color: #aeb8ca;
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+.menu-particula {
+  padding: 1.2rem;
+}
+
+.comparacion .simbolo-particula {
+  background: linear-gradient(
+    90deg,
+    #00a8ff 50%,
+    #ff304f 50%
+  );
+  font-size: 0.7rem;
+}
+
+.resultado-comparacion {
+  margin-top: 0.9rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.resultado-comparacion p {
+  margin: 0.35rem 0;
+  color: #bfc9d8;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+#razon-aceleracion {
+  color: white;
 }
