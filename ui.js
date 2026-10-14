@@ -7,6 +7,9 @@ const botonesTipoParticula = document.querySelectorAll(
   ".boton-tipo-particula"
 );
 const botonesModo = document.querySelectorAll(".boton-modo");
+const botonesEscenario = document.querySelectorAll(
+  ".boton-escenario:not(:disabled)"
+);
 const controlMagnitud = document.getElementById("control-magnitud");
 const valorMagnitud = document.getElementById("valor-magnitud");
 const botonCampoVectorial = document.getElementById(
@@ -186,12 +189,23 @@ function actualizarEscena() {
     cargas.length === 0 && particulas.length === 0;
 }
 
+function seleccionarBotonEscenario(escenario) {
+  botonesEscenario.forEach(function (boton) {
+    const estaSeleccionado =
+      boton.dataset.escenario === escenario;
+
+    boton.classList.toggle("seleccionada", estaSeleccionado);
+    boton.setAttribute("aria-pressed", estaSeleccionado);
+  });
+}
+
 function agregarCarga(x, y) {
   const valorCarga =
     signoCargaSeleccionada * magnitudCargaSeleccionada;
   const carga = crearCarga(x, y, valorCarga);
 
   cargas.push(carga);
+  seleccionarBotonEscenario("libre");
   actualizarEscena();
 }
 
@@ -202,6 +216,7 @@ function eliminarCarga(x, y) {
 
     if (distancia <= radioCarga(carga)) {
       cargas.splice(i, 1);
+      seleccionarBotonEscenario("libre");
       actualizarEscena();
       return;
     }
@@ -344,8 +359,67 @@ function limpiarEscenario() {
 
   tiempoAnterior = null;
   acumuladorTiempo = 0;
+  seleccionarBotonEscenario("libre");
   actualizarEscena();
   limpiarLecturaCursor();
+}
+
+function cargarDipolo() {
+  limpiarEscenario();
+
+  const ancho = lienzo.clientWidth;
+  const alto = lienzo.clientHeight;
+  const magnitud = 2;
+
+  cargas.push(
+    crearCarga(ancho * 0.4, alto * 0.5, magnitud),
+    crearCarga(ancho * 0.6, alto * 0.5, -magnitud)
+  );
+
+  seleccionarBotonEscenario("dipolo");
+  actualizarEscena();
+}
+
+function cargarPlacasParalelas() {
+  limpiarEscenario();
+
+  const ancho = lienzo.clientWidth;
+  const alto = lienzo.clientHeight;
+  const xPositiva = ancho * 0.3;
+  const xNegativa = ancho * 0.7;
+  const margenVertical = alto * 0.15;
+  const cantidadPorPlaca = 9;
+  const magnitud = 1;
+  const alturaUtil = alto - margenVertical * 2;
+
+  for (let i = 0; i < cantidadPorPlaca; i++) {
+    const progreso = i / (cantidadPorPlaca - 1);
+    const y = margenVertical + alturaUtil * progreso;
+
+    cargas.push(
+      crearCarga(xPositiva, y, magnitud),
+      crearCarga(xNegativa, y, -magnitud)
+    );
+  }
+
+  seleccionarBotonEscenario("placas");
+  actualizarEscena();
+}
+
+function cargarEscenario(evento) {
+  const escenario = evento.currentTarget.dataset.escenario;
+
+  if (escenario === "dipolo") {
+    cargarDipolo();
+    return;
+  }
+
+  if (escenario === "placas") {
+    cargarPlacasParalelas();
+    return;
+  }
+
+  limpiarEscenario();
 }
 
 function formatearValor(valor) {
@@ -439,5 +513,9 @@ botonesTipoParticula.forEach(function (boton) {
 
 botonesModo.forEach(function (boton) {
   boton.addEventListener("click", seleccionarModo);
+});
+
+botonesEscenario.forEach(function (boton) {
+  boton.addEventListener("click", cargarEscenario);
 });
 

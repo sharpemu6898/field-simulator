@@ -161,6 +161,47 @@ h1 {
   width: 100%;
 }
 
+.selector-escenarios {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.selector-escenarios h3 {
+  margin: 0 0 1rem;
+  color: var(--color_texto);
+}
+
+.opciones-escenario {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.boton-escenario {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--azul-electrico);
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--color_texto);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.boton-escenario:hover,
+.boton-escenario.seleccionada {
+  background-color: var(--azul-electrico);
+  box-shadow: 0 0 12px var(--azul-electrico);
+}
+
+.boton-escenario:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 @media (max-width: 800px) {
   .contenido-simulador {
     grid-template-columns: 1fr;
@@ -172,6 +213,12 @@ h1 {
 
   #titulo-simulador {
     white-space: normal;
+  }
+}
+
+@media (max-width: 600px) {
+  .opciones-escenario {
+    grid-template-columns: 1fr;
   }
 }
 
