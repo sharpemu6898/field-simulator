@@ -54,6 +54,10 @@ let cuadroRedimension = null;
 let idAnimacionParticulas = null;
 let tiempoAnterior = null;
 let acumuladorTiempo = 0;
+let cargaArrastrada = null;
+let idPunteroArrastre = null;
+let bloquearClickHasta = 0;
+let cuadroArrastre = null;
 
 function iniciarSimulador() {
   portada.hidden = true;
@@ -329,10 +333,115 @@ function animarParticulas(tiempoActual) {
   }
 }
 
+function obtenerPosicionLienzo(evento) {
+  const limites = lienzo.getBoundingClientRect();
+
+  return {
+    x: evento.clientX - limites.left,
+    y: evento.clientY - limites.top
+  };
+}
+
+function buscarCargaEn(x, y) {
+  for (let i = cargas.length - 1; i >= 0; i--) {
+    const carga = cargas[i];
+    const distancia = Math.hypot(x - carga.x, y - carga.y);
+
+    if (distancia <= radioCarga(carga)) {
+      return carga;
+    }
+  }
+
+  return null;
+}
+
+function iniciarArrastreCarga(evento) {
+  if (evento.button !== 0 || modoLienzo === "eliminar") {
+    return;
+  }
+
+  const posicion = obtenerPosicionLienzo(evento);
+  const cargaSeleccionada = buscarCargaEn(
+    posicion.x,
+    posicion.y
+  );
+
+  if (!cargaSeleccionada) return;
+
+  cargaArrastrada = cargaSeleccionada;
+  idPunteroArrastre = evento.pointerId;
+
+  lienzo.setPointerCapture(evento.pointerId);
+  lienzo.classList.add("arrastrando");
+  evento.preventDefault();
+}
+
+function programarDibujoArrastre() {
+  if (cuadroArrastre !== null) return;
+
+  cuadroArrastre = requestAnimationFrame(function () {
+    cuadroArrastre = null;
+    actualizarEscena();
+  });
+}
+
+function moverCargaArrastrada(evento) {
+  if (
+    cargaArrastrada === null ||
+    evento.pointerId !== idPunteroArrastre
+  ) {
+    return;
+  }
+
+  const posicion = obtenerPosicionLienzo(evento);
+  const radio = radioCarga(cargaArrastrada);
+
+  cargaArrastrada.x = Math.max(
+    radio,
+    Math.min(lienzo.clientWidth - radio, posicion.x)
+  );
+  cargaArrastrada.y = Math.max(
+    radio,
+    Math.min(lienzo.clientHeight - radio, posicion.y)
+  );
+
+  seleccionarBotonEscenario("libre");
+  programarDibujoArrastre();
+  evento.preventDefault();
+}
+
+function finalizarArrastreCarga(evento) {
+  if (
+    cargaArrastrada === null ||
+    evento.pointerId !== idPunteroArrastre
+  ) {
+    return;
+  }
+
+  cargaArrastrada = null;
+  idPunteroArrastre = null;
+  bloquearClickHasta = performance.now() + 150;
+
+  lienzo.classList.remove("arrastrando");
+
+  if (lienzo.hasPointerCapture(evento.pointerId)) {
+    lienzo.releasePointerCapture(evento.pointerId);
+  }
+
+  if (cuadroArrastre !== null) {
+    cancelAnimationFrame(cuadroArrastre);
+    cuadroArrastre = null;
+  }
+
+  actualizarEscena();
+}
+
 function manejarClickLienzo(evento) {
-  const posicionLienzo = lienzo.getBoundingClientRect();
-  const x = evento.clientX - posicionLienzo.left;
-  const y = evento.clientY - posicionLienzo.top;
+  if (performance.now() < bloquearClickHasta) return;
+
+  const posicion = obtenerPosicionLienzo(evento);
+  const x = posicion.x;
+  const y = posicion.y;
 
   if (modoLienzo === "eliminar") {
     eliminarCarga(x, y);
@@ -497,6 +606,10 @@ botonComienzo.addEventListener("click", iniciarSimulador);
 controlMagnitud.addEventListener("input", cambiarMagnitud);
 botonLimpiar.addEventListener("click", limpiarEscenario);
 lienzo.addEventListener("click", manejarClickLienzo);
+lienzo.addEventListener("pointerdown", iniciarArrastreCarga);
+lienzo.addEventListener("pointermove", moverCargaArrastrada);
+lienzo.addEventListener("pointerup", finalizarArrastreCarga);
+lienzo.addEventListener("pointercancel", finalizarArrastreCarga);
 lienzo.addEventListener("mousemove", registrarMovimientoCursor);
 lienzo.addEventListener("mouseleave", limpiarLecturaCursor);
 botonCampoVectorial.addEventListener("click", alternarCampoVectorial);
