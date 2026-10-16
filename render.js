@@ -164,6 +164,18 @@ function dibujarCarga(carga) {
       : "#7d8799";
   const radio = 18 + Math.min(Math.abs(valor), 5) * 2;
 
+  if (carga.seleccionada) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(carga.x, carga.y, radio + 7, 0, Math.PI * 2);
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 3;
+    ctx.shadowColor = "#ffffff";
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   ctx.save();
   ctx.beginPath();
   ctx.arc(carga.x, carga.y, radio, 0, Math.PI * 2);

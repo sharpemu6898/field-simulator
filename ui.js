@@ -12,6 +12,9 @@ const botonesEscenario = document.querySelectorAll(
 );
 const controlMagnitud = document.getElementById("control-magnitud");
 const valorMagnitud = document.getElementById("valor-magnitud");
+const descripcionMagnitud = document.getElementById(
+  "descripcion-magnitud"
+);
 const botonCampoVectorial = document.getElementById(
   "boton-campo-vectorial"
 );
@@ -58,6 +61,7 @@ let cargaArrastrada = null;
 let idPunteroArrastre = null;
 let bloquearClickHasta = 0;
 let cuadroArrastre = null;
+let cargaSeleccionada = null;
 
 function iniciarSimulador() {
   portada.hidden = true;
@@ -79,8 +83,18 @@ function seleccionarTipoCarga(evento) {
 }
 
 function cambiarMagnitud() {
-  magnitudCargaSeleccionada = Number(controlMagnitud.value);
-  valorMagnitud.textContent = magnitudCargaSeleccionada;
+  const nuevaMagnitud = Number(controlMagnitud.value);
+
+  magnitudCargaSeleccionada = nuevaMagnitud;
+  valorMagnitud.textContent = nuevaMagnitud;
+
+  if (!cargaSeleccionada) return;
+
+  const signo = Math.sign(cargaSeleccionada.valor) || 1;
+  cargaSeleccionada.valor = signo * nuevaMagnitud;
+
+  seleccionarBotonEscenario("libre");
+  actualizarEscena();
 }
 
 function seleccionarTipoParticula(evento) {
@@ -203,12 +217,36 @@ function seleccionarBotonEscenario(escenario) {
   });
 }
 
+function seleccionarCarga(carga) {
+  if (cargaSeleccionada) {
+    cargaSeleccionada.seleccionada = false;
+  }
+
+  cargaSeleccionada = carga;
+
+  if (!cargaSeleccionada) {
+    descripcionMagnitud.textContent =
+      "Se aplicará a las cargas nuevas.";
+    return;
+  }
+
+  cargaSeleccionada.seleccionada = true;
+
+  const magnitud = Math.abs(cargaSeleccionada.valor);
+  controlMagnitud.value = magnitud;
+  valorMagnitud.textContent = magnitud;
+  magnitudCargaSeleccionada = magnitud;
+  descripcionMagnitud.textContent =
+    "Editando esta carga. El valor también se aplicará a cargas nuevas.";
+}
+
 function agregarCarga(x, y) {
   const valorCarga =
     signoCargaSeleccionada * magnitudCargaSeleccionada;
   const carga = crearCarga(x, y, valorCarga);
 
   cargas.push(carga);
+  seleccionarCarga(carga);
   seleccionarBotonEscenario("libre");
   actualizarEscena();
 }
@@ -219,6 +257,10 @@ function eliminarCarga(x, y) {
     const distancia = Math.hypot(x - carga.x, y - carga.y);
 
     if (distancia <= radioCarga(carga)) {
+      if (carga === cargaSeleccionada) {
+        seleccionarCarga(null);
+      }
+
       cargas.splice(i, 1);
       seleccionarBotonEscenario("libre");
       actualizarEscena();
@@ -361,14 +403,17 @@ function iniciarArrastreCarga(evento) {
   }
 
   const posicion = obtenerPosicionLienzo(evento);
-  const cargaSeleccionada = buscarCargaEn(
+  const cargaEncontrada = buscarCargaEn(
     posicion.x,
     posicion.y
   );
 
-  if (!cargaSeleccionada) return;
+  if (!cargaEncontrada) return;
 
-  cargaArrastrada = cargaSeleccionada;
+  seleccionarCarga(cargaEncontrada);
+  actualizarEscena();
+
+  cargaArrastrada = cargaEncontrada;
   idPunteroArrastre = evento.pointerId;
 
   lienzo.setPointerCapture(evento.pointerId);
@@ -457,6 +502,7 @@ function manejarClickLienzo(evento) {
 }
 
 function limpiarEscenario() {
+  seleccionarCarga(null);
   cargas.length = 0;
   particulas.length = 0;
   resultadoComparacion.hidden = true;
