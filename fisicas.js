@@ -107,14 +107,16 @@ function calcularLineasDeCampo(cargas, opciones = {}) {
   const lineasPorCarga = opciones.lineasPorCarga || 12;
   const lineas = [];
 
-  const positivas = cargas.filter(function (c) { return c.valor > 0; });
-  const fuentes = positivas.length > 0
-    ? positivas
-    : cargas.filter(function (c) { return c.valor < 0; });
+  const positivas = cargas.filter(function (carga) {
+    return carga.valor > 0;
+  });
+  const negativas = cargas.filter(function (carga) {
+    return carga.valor < 0;
+  });
+  const fuentes = positivas.length > 0 ? positivas : negativas;
   const direccion = positivas.length > 0 ? 1 : -1;
 
   for (const fuente of fuentes) {
-
     const cantidad = Math.max(
       6,
       Math.min(48, Math.round(lineasPorCarga * Math.abs(fuente.valor)))
@@ -127,6 +129,62 @@ function calcularLineasDeCampo(cargas, opciones = {}) {
       const y0 = fuente.y + Math.sin(angulo) * radioInicio;
 
       lineas.push(calcularLineaDeCampo(cargas, x0, y0, direccion, opciones));
+    }
+  }
+
+  if (positivas.length === 0 || negativas.length === 0) {
+    return lineas;
+  }
+
+  let pesoPositivoTotal = 0;
+  let centroPositivoX = 0;
+  let centroPositivoY = 0;
+
+  for (const positiva of positivas) {
+    const peso = Math.abs(positiva.valor);
+    centroPositivoX += positiva.x * peso;
+    centroPositivoY += positiva.y * peso;
+    pesoPositivoTotal += peso;
+  }
+
+  centroPositivoX /= pesoPositivoTotal;
+  centroPositivoY /= pesoPositivoTotal;
+
+  for (const negativa of negativas) {
+    const cantidadExterior = Math.max(
+      4,
+      Math.min(
+        24,
+        Math.round(
+          (lineasPorCarga * Math.abs(negativa.valor)) / 2
+        )
+      )
+    );
+    const radioInicio = radioCarga(negativa) + 2;
+    const anguloHaciaPositivas = Math.atan2(
+      centroPositivoY - negativa.y,
+      centroPositivoX - negativa.x
+    );
+    const anguloExterior = anguloHaciaPositivas + Math.PI;
+
+    for (let i = 0; i < cantidadExterior; i++) {
+      const progreso =
+        cantidadExterior === 1 ? 0.5 : i / (cantidadExterior - 1);
+      const angulo =
+        anguloExterior - Math.PI / 2 + progreso * Math.PI;
+      const x0 = negativa.x + Math.cos(angulo) * radioInicio;
+      const y0 = negativa.y + Math.sin(angulo) * radioInicio;
+      const linea = calcularLineaDeCampo(
+        cargas,
+        x0,
+        y0,
+        -1,
+        opciones
+      );
+
+      if (linea.length > 1) {
+        lineas.push(linea.reverse());
+      }
     }
   }
 
